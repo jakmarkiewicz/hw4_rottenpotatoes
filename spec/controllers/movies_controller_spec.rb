@@ -7,7 +7,7 @@ describe MoviesController do
 	    @fakeMovies = [mock('Movie1'), mock('Movie2')]
 	end
 
-	describe 'create/destory a movie' do
+	describe 'create/destory/edit a movie' do
 	    it 'should create a new movie' do
 		    MoviesController.stub(:create).and_return(@fakeMovie)
 		    post :create, {:id => "1"}
@@ -17,6 +17,22 @@ describe MoviesController do
 		    @fakeMovie.should_receive(:destroy)
 		    delete :destroy, {:id => "1"}
 	    end
+		it 'should edit a movie' do
+		    Movie.stub(:find).with("1").and_return(@fakeMovie)
+		    get :edit, {:id => "1"}
+		    response.should render_template 'edit'
+	    end
+	    it 'should show a movie' do
+		    Movie.stub(:find).with("1").and_return(@fakeMovie)
+		    get :show, {:id => "1"}
+		    response.should render_template 'show'
+	    end
+	    it 'should index movies' do
+		    Movie.stub(:find).with("1").and_return(@fakeMovie)
+		    get :index, {:id => "1"}
+		    response.should render_template 'index'
+	    end
+
 	end
 
 	describe 'update movie director info' do
@@ -48,6 +64,12 @@ describe MoviesController do
 	        response.should render_template 'movies/similar'
 	        assigns(:movies).should == @fakeMovies
     	end
+		it 'should call Model method to get movies with same director' do
+			Movie.should_receive(:find).with("1").and_return(@fakeMovie)
+			Movie.should_receive(:find_all_by_director).and_return(@fakeMovies)
+			get :similar, {:id => "1"}
+		end
+
   	end
 
   	describe 'sad path for finding movies by same director' do
