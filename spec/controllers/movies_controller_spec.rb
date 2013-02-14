@@ -27,12 +27,21 @@ describe MoviesController do
 		    get :show, {:id => "1"}
 		    response.should render_template 'show'
 	    end
-	    it 'should index movies' do
-		    Movie.stub(:find).with("1").and_return(@fakeMovie)
-		    get :index, {:id => "1"}
-		    response.should render_template 'index'
+	    it 'should sort movies by title' do
+		    Movie.stub(:find).and_return(@fakeMovie)
+			Movie.stub(:find_all_by_director).and_return(@fakeMovies)
+		    get :index, {:id => "1", :sort => "title", :ratings => "PG"}
 	    end
-
+	    it 'should sort movies by release date' do
+	    	Movie.stub(:find).and_return(@fakeMovie)
+			Movie.stub(:find_all_by_director).and_return(@fakeMovies)
+		    get :index, {:id => "1", :sort => "release_date", :ratings => {}}
+		end
+		it "should index all movies" do
+		    Movie.stub(:all) { [@fakeMovie] }
+		    get :index
+		    response.should render_template 'index'
+    	end
 	end
 
 	describe 'update movie director info' do
